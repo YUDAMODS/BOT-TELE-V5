@@ -70,102 +70,13 @@ bot.start((ctx) => {
     }
 });
 
-bot.command('buysc', (ctx) => {
-    ctx.replyWithMarkdown(`
-BUY SC?
-NO ENC - 50K
-🔥 TELEGRAM @YUDAMODS 🔥
-`, Markup.inlineKeyboard([
-        Markup.urlButton('🛒 CONTACT 🛒', 'https://t.me/YUDAMODS')
-    ]));
-});
-
-
-bot.command('bc', (ctx) => {
-    if (ctx.from.id.toString() === ownerId) {
-    const bcMessage = ctx.message.text.split(' ').slice(1).join(' ');
-
-    switch (true) {
-        case !bcMessage:
-            ctx.reply('Contoh penggunaan:\n/bc Pesan Anda');
-            break;
-
-        default:
-            userList.forEach(user => {
-                const [userId, userNumber] = user.split('/');
-                bot.telegram.sendPhoto(userNumber, { source: thumbPath }, { caption: bcMessage });
-            });
-
-            ctx.reply('Pesan broadcast telah dikirim ke semua pengguna.');
-            break;
-    }
-});
-
-} else {
-        ctx.replyWithPhoto(thumbPath, { caption: 'Maaf, Anda bukan owner bot.'});
-      }
-
-bot.command('jpm', (ctx) => {
-    if (ctx.from.id.toString() === ownerId) {
-    const jpmMessage = ctx.message.text.split(' ').slice(1).join(' ');
-
-    switch (true) {
-        case !jpmMessage:
-            ctx.reply('Contoh penggunaan:\n/jpm Pesan Anda');
-            break;
-
-        default:
-            userList.forEach(user => {
-                const [userId, userNumber] = user.split('/');
-                bot.telegram.sendPhoto(userNumber, { source: thumbPath }, { caption: jpmMessage });
-            });
-
-            ctx.reply('Pesan jpm telah dikirim ke semua pengguna.');
-            break;
-    }
-});
-
-} else {
-        ctx.replyWithPhoto(thumbPath, { caption: 'Maaf, Anda bukan owner bot.'});
-      }
       
-      
-bot.command('ceksaldo', async (ctx) => {
-    const user = ctx.from;
-    const saldo = await getSaldo(user.id);
-    ctx.reply(`Saldo kamu saat ini Rp${saldo}`);
-});
 
 /*bot.command('deposit', async (ctx) => {
     ctx.replyWithPhoto(qris, { caption: 'Silahkan scan QRIS berikut untuk melakukan deposit'});
     await ctx.reply('Setelah melakukan transfer, kirimkan bukti transfer dengan format: /bukti [jumlah transfer]');
 }); */
 
-bot.command('bukti', async (ctx) => {
-    let bukti = ctx.message.text.replace('/bukti ', '');
-    let [jumlah, bukti_file_id] = bukti.split(' ');
-    jumlah = parseInt(jumlah);
-
-    if (!jumlah || !bukti_file_id) {
-        await ctx.reply('Format bukti transfer salah. Coba ulangi dengan format: /bukti [jumlah transfer] [bukti transfer file id]');
-    }
-    else {
-        await ctx.reply('Bukti transfer telah diterima. Kami akan memproses deposit kamu segera.');
-        await saveDeposit(ctx.from.id, jumlah, bukti_file_id);
-    }
-});
-
-bot.command('confirm', async (ctx) => {
-    let deposit = await getDeposit(ctx.message.text.replace('/confirm ', ''));
-    if (!deposit) {
-        await ctx.reply('Deposit tidak ditemukan.');
-    }
-    else {
-        await updateSaldo(deposit.user_id, deposit.jumlah);
-        await setDepositStatus(deposit.id, 'confirmed');
-        await ctx.reply(`Deposit Rp${deposit.jumlah} telah dikonfirmasi. Saldo kamu saat ini Rp${await getSaldo(deposit.user_id)}.`);
-    }
-});
 
 bot.on('text', async (ctx) => {
   const message = ctx.message.text;
@@ -180,7 +91,7 @@ bot.on('text', async (ctx) => {
 
   switch (command) {
     case '/menu':
-      await loading();
+     // await loading();
       const menuText = `${greeting} Kak ${name}!
 
 ╭──❏「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」❏
@@ -205,7 +116,7 @@ bot.on('text', async (ctx) => {
       break;
       
       case '/verifymenu':
-      await loading();
+      //await loading();
       const verifyText = `${greeting} Kak ${name}!
 
 ╭──❏「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」❏
@@ -240,7 +151,7 @@ bot.on('text', async (ctx) => {
       break;
 
     case '/allmenu':
-      await loading();
+      //await loading();
       const allmenuText = `${greeting} Kak ${name}!
 
 ╭──❏「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」❏
@@ -292,7 +203,7 @@ bot.on('text', async (ctx) => {
       break;
       
       case '/ddosmenu':
-      await loading();
+   //   await loading();
       const ddosText = `${greeting} Kak ${name}!
 
 ╭──❏「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」❏
@@ -328,6 +239,81 @@ bot.on('text', async (ctx) => {
       await ctx.replyWithMarkdown(creatorMessage, replyMarkup);
       await ctx.replyWithVoice({ url: voiceOwner });
   //    logs('Creator response sent', 'green', `From: ${name} (@${tag || 'N/A'})`, `Date: ${now.toLocaleString()}`);
+      break;
+      
+      case '/bukti':
+      let bukti = message.replace('/bukti ', '');
+      let [jumlah, bukti_file_id] = bukti.split(' ');
+      jumlah = parseInt(jumlah);
+
+      if (!jumlah || !bukti_file_id) {
+          await ctx.reply('Format bukti transfer salah. Coba ulangi dengan format: /bukti [jumlah transfer] [bukti transfer file id]');
+      }
+      else {
+          await ctx.reply('Bukti transfer telah diterima. Kami akan memproses deposit kamu segera.');
+          await saveDeposit(ctx.from.id, jumlah, bukti_file_id);
+      }
+      
+      break;
+
+    case '/confirm':
+      if (ctx.from.id.toString() === ownerId) {
+      let deposit = await getDeposit(message.replace('/confirm ', ''));
+      if (!deposit) {
+          await ctx.reply('Deposit tidak ditemukan.');
+      }
+      else {
+          await updateSaldo(deposit.user_id, deposit.jumlah);
+          await setDepositStatus(deposit.id, 'confirmed');
+          await ctx.reply(`Deposit Rp${deposit.jumlah} telah dikonfirmasi. Saldo kamu saat ini Rp${await getSaldo(deposit.user_id)}.`);
+      }
+      break;
+      
+      case '/ceksaldo':
+      const saldo = await getSaldo(ctx.from.id);
+      ctx.reply(`Saldo kamu saat ini Rp${saldo}`);
+      
+      } else {
+        ctx.replyWithPhoto(thumbPath, { caption: 'Maaf, Anda bukan owner bot.'});
+      }
+      break;
+      
+      case '/buysc':
+      ctx.replyWithMarkdown(`
+BUY SC?
+NO ENC - 50K
+🔥 TELEGRAM @YUDAMODS 🔥
+`, Markup.inlineKeyboard([
+        Markup.urlButton('🛒 CONTACT 🛒', 'https://t.me/YUDAMODS')
+      ]));
+      break;
+      
+      case '/bc':
+      const bcMessage = message.split(' ').slice(1).join(' ');
+
+      if (!bcMessage) {
+        ctx.reply('Contoh penggunaan:\n/bc Pesan Anda');
+      } else {
+        userList.forEach(user => {
+          const [userId, userNumber] = user.split('/');
+          bot.telegram.sendPhoto(userNumber, { source: thumbPath }, { caption: bcMessage });
+        });
+        ctx.reply('Pesan broadcast telah dikirim ke semua pengguna.');
+      }
+      break;
+
+    case '/jpm':
+      const jpmMessage = message.split(' ').slice(1).join(' ');
+
+      if (!jpmMessage) {
+        ctx.reply('Contoh penggunaan:\n/jpm Pesan Anda');
+      } else {
+        userList.forEach(user => {
+          const [userId, userNumber] = user.split('/');
+          bot.telegram.sendPhoto(userNumber, { source: thumbPath }, { caption: jpmMessage });
+        });
+        ctx.reply('Pesan jpm telah dikirim ke semua pengguna.');
+      }
       break;
       
 
@@ -541,7 +527,7 @@ case '/udp':
     break;
 
     case '/lanjutkan':
-        await loading();
+   //     await loading();
         const lanjutkanText = `${greeting} Kak ${name}!
 
 ╭──❏「 𝗜𝗡𝗙𝗢 𝗨𝗦𝗘𝗥 」❏
