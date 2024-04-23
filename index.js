@@ -269,13 +269,9 @@ bot.on('text', async (ctx) => {
       }
       break;
       
-      case '/ceksaldo':
-      const saldo = await getSaldo(ctx.from.id);
-      ctx.reply(`Saldo kamu saat ini Rp${saldo}`);
-      
-      } else {
-        ctx.replyWithPhoto(thumbPath, { caption: 'Maaf, Anda bukan owner bot.'});
-      }
+     case '/ceksaldo':
+     const saldo = await getSaldo(ctx.from.id);
+     ctx.reply(`Saldo kamu saat ini Rp${saldo}`);
       break;
       
       case '/buysc':
